@@ -1,9 +1,13 @@
 from rest_framework import viewsets, generics
-from rest_framework.permissions import AllowAny
-from .models import Payment, User
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from materials.models import Course
+from .models import Payment, User, Subscription
 from .serializers import PaymentSerializer, UserSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from django.shortcuts import get_object_or_404
 
 
 class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
@@ -31,3 +35,27 @@ class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class SubscriptionToggleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        course_id = request.data.get('course_id')
+
+        if not course_id:
+            return Response({'error': 'course_id обязателен'}, status=400)
+
+        course = get_object_or_404(Course, id=course_id)
+
+        subscription = Subscription.objects.filter(user=user, course=course)
+
+        if subscription.exists():
+            subscription.delete()
+            message = 'Подписка удалена'
+        else:
+            Subscription.objects.create(user=user, course=course)
+            message = 'Подписка добавлена'
+
+        return Response({'message': message})

@@ -1,8 +1,8 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-
-from users.permissions import IsModerator, IsOwner
+from .paginators import CourseLessonPagination
+from users.permissions import IsOwner, IsNotModerator, IsModeratorOrOwner, IsModeratorOrCourseOwner
 from .models import Course, Lesson
 from .serializers import CourseSerializer, LessonSerializer
 
@@ -12,7 +12,7 @@ class LessonListCreateAPIView(ListCreateAPIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [IsAuthenticated(), ~IsModerator()]
+            return [IsAuthenticated(), IsNotModerator()]
         return [IsAuthenticated()]
 
     def get_queryset(self):
@@ -30,38 +30,29 @@ class LessonRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
     def get_permissions(self):
         if self.request.method in ['PUT', 'PATCH']:
-            return [IsAuthenticated(), IsModerator() | IsOwner()]
+            return [IsAuthenticated(), IsModeratorOrOwner()]
         elif self.request.method == 'DELETE':
             return [IsAuthenticated(), IsOwner()]
         return [IsAuthenticated()]
 
     def get_queryset(self):
-        user = self.request.user
-        if user.groups.filter(name='moderators').exists():
-            return Lesson.objects.all()
-        return Lesson.objects.filter(owner=user)
+        return Lesson.objects.all()
 
 
 class CourseViewSet(viewsets.ModelViewSet):
+    pagination_class = CourseLessonPagination
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
 
     def get_permissions(self):
         if self.action == 'create':
-            # Только авторизованные, но не модераторы
-            self.permission_classes = [IsAuthenticated, ~IsModerator]
+            return [IsAuthenticated(), IsNotModerator()]
         elif self.action in ['update', 'partial_update']:
-            # Модераторы ИЛИ владелец
-            self.permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+            return [IsAuthenticated(), IsModeratorOrCourseOwner()]
         elif self.action == 'destroy':
-            # Только владелец
-            self.permission_classes = [IsAuthenticated, IsOwner]
-        elif self.action in ['list', 'retrieve']:
-            # Все авторизованные
-            self.permission_classes = [IsAuthenticated]
+            return [IsAuthenticated(), IsOwner()]
         else:
-            self.permission_classes = [IsAuthenticated]
-        return [permission() for permission in self.permission_classes]
+            return [IsAuthenticated()]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
