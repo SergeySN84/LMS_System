@@ -8,6 +8,7 @@ from .serializers import PaymentSerializer, UserSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 
 
 class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
@@ -35,6 +36,13 @@ class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return self.request.user
+
+@extend_schema(
+    summary="Переключить подписку на курс",
+    description='Если подписка есть - удаляет, если нет - создает',
+    request={"course_id": {"type": "integer"}},
+    responses={200: {"message": {"type": "string"}}}
+)
 
 
 class SubscriptionToggleView(APIView):

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Course, Lesson
 from .validators import validate_video_url
+from drf_spectacular.utils import extend_schema_field
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -13,6 +14,7 @@ class LessonSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True)
     lessons_count = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = Course

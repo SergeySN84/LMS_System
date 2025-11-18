@@ -58,6 +58,8 @@ class Payment(models.Model):
         max_length=10,
         choices=PAYMENT_METHOD_CHOICES
     )
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
+    stripe_payment_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
         item = self.course or self.lesson
