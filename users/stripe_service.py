@@ -6,7 +6,10 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def create_stripe_product(name: str, description: str = ""):
     """Создаёт продукт в Stripe"""
-    return stripe.Product.create(name=name, description=description)
+    return stripe.Product.create(
+        name=name,
+        description=description or ""
+    )
 
 
 def create_stripe_price(product_id: str, amount: int, currency: str = "usd"):
@@ -21,15 +24,15 @@ def create_stripe_price(product_id: str, amount: int, currency: str = "usd"):
     )
 
 
-def create_stripe_session(price_id: str, success_url: str, cancel_url: str):
-    """Создаёт сессию оплаты"""
+def create_stripe_checkout_session(price_id: str, success_url: str, cancel_url: str):
+    """Создаёт сессию оплаты в Stripe Checkout"""
     session = stripe.checkout.Session.create(
-        payment_method_types=['card'],
+        payment_method_types=["card"],
         line_items=[{
-            'price': price_id,
-            'quantity': 1,
+            "price": price_id,
+            "quantity": 1,
         }],
-        mode='payment',
+        mode="payment",
         success_url=success_url,
         cancel_url=cancel_url,
     )
