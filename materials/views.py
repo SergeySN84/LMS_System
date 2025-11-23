@@ -5,7 +5,7 @@ from .paginators import CourseLessonPagination
 from users.permissions import IsOwner, IsNotModerator, IsModeratorOrOwner, IsModeratorOrCourseOwner
 from .models import Course, Lesson
 from .serializers import CourseSerializer, LessonSerializer
-
+from .tasks import send_course_update_notification
 
 class LessonListCreateAPIView(ListCreateAPIView):
     serializer_class = LessonSerializer
@@ -56,3 +56,8 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
+        course = serializer.save()
+        # Асинхронно запускаем рассылку
+        send_course_update_notification.delay(course.id)

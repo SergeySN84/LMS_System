@@ -1,5 +1,5 @@
 from django.db import models
-from django.conf import settings
+from django.utils import timezone
 
 class Course(models.Model):
     owner = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True)
@@ -7,6 +7,7 @@ class Course(models.Model):
     preview = models.ImageField(upload_to='course_previews/', blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    updated_at = models.DateTimeField(auto_now=True)
 
 class Lesson(models.Model):
     owner = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True)
