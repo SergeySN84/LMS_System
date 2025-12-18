@@ -27,8 +27,8 @@ router.register(r'courses', CourseViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name= 'swagger_ui'),
     path('', include('users.urls')),
-    path('api/', include('materials.urls')),
-    path('api/schema', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs', SpectacularSwaggerView.as_view(url_name='schema'), name= 'swagger_ui'),
+    path('', include('materials.urls')),
 ]
