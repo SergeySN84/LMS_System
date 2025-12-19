@@ -2,7 +2,7 @@ name: Deploy LMS to Production
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "Feature/homework 35.2" ]
 
 jobs:
   test:
