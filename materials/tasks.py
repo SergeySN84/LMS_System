@@ -3,9 +3,11 @@ from django.core.mail import send_mail
 from django.conf import settings
 from users.models import Subscription
 
+
 @shared_task
 def send_course_update_notification(course_id):
     from materials.models import Course
+
     course = Course.objects.get(id=course_id)
 
     from django.utils import timezone
@@ -22,7 +24,8 @@ def send_course_update_notification(course_id):
 
     send_mail(
         subject=f"Обновление курса: {course.title}",
-        message=f"Курс '{course.title}' был обновлён. Зайдите, чтобы посмотреть новые материалы.",
+        message=f"Курс '{course.title}' был обновлён. Зайдите,"
+                f" чтобы посмотреть новые материалы.",
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=emails,
         fail_silently=False,
