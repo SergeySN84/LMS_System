@@ -7,7 +7,7 @@ on:
       - "feature/homework_30.1"
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,27 +26,63 @@ jobs:
       - name: Install dependencies
         run: poetry install --only main
 
-      - name: Run tests
-        run: |
-          cp .env.example .env
-          python manage.py migrate
-          python -m pytest materials/tests.py
+      - name: Run linter (flake8)
+        run: flake8 .
 
-  deploy:
-    needs: test
+  test:
     runs-on: ubuntu-latest
+    needs: lint
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: |
+          pip install poetry
+          poetry config virtualenvs.create false
+
+      - name: Install dependencies
+        run: poetry install --only main
+
+      - name: Run migrations
+        run: |
+          cp .env.example .env
+          python manage.py migrate --run-syncdb
+
+      - name: Run tests
+        run: python -m pytest materials/tests.py
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t lms-backend .
+          docker images
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/app
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d --build
+            git fetch origin
+            git checkout "feature/homework_35.2"
+            git pull origin "feature/homework_35.2"
+            docker-compose -f docker-compose.prod.yaml down
+            docker-compose -f docker-compose.prod.yaml up -d --build
