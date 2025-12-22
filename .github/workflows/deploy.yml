@@ -18,6 +18,38 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install linter
+        run: pip install flake8
+
+      - name: Run linter (flake8)
+        run: flake8 .
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: lms_test
+          POSTGRES_USER: lms_user
+          POSTGRES_PASSWORD: lms_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Install Poetry
         run: |
           pip install poetry
@@ -26,52 +58,14 @@ jobs:
       - name: Install dependencies
         run: poetry install --only main
 
-      - name: Run linter (flake8)
-        run: flake8 .
-
-  jobs:
-    test:
-      runs-on: ubuntu-latest
-      services:
-        postgres:
-          image: postgres:15
-          env:
-            POSTGRES_DB: lms_test
-            POSTGRES_USER: lms_user
-            POSTGRES_PASSWORD: lms_pass
-          ports:
-            - 5432:5432
-          options: >-
-            --health-cmd pg_isready
-            --health-interval 10s
-            --health-timeout 5s
-            --health-retries 5
-
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
-
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: "3.12"
-
-        - name: Install Poetry
-          run: |
-            pip install poetry
-            poetry config virtualenvs.create false
-
-        - name: Install dependencies
-          run: poetry install --only main
-
-        - name: Run tests
-          run: poetry run python manage.py test
-          env:
-            DB_HOST: localhost
-            DB_PORT: 5432
-            DB_NAME: lms_test
-            DB_USER: l0
-            DB_PASSWORD: lms_pass
+      - name: Run tests
+        run: poetry run python manage.py test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: lms_test
+          DB_USER: lms_user
+          DB_PASSWORD: lms_pass
 
   build:
     runs-on: ubuntu-latest
@@ -79,6 +73,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
         run: |
