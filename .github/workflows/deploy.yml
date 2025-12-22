@@ -58,6 +58,15 @@ jobs:
       - name: Install dependencies
         run: poetry install --only main
 
+      - name: Apply migrations
+        run: poetry run python manage.py migrate
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: lms_test
+          DB_USER: lms_user
+          DB_PASSWORD: lms_pass
+
       - name: Run tests
         run: poetry run python manage.py test
         env:
