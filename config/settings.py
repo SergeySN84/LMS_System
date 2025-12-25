@@ -174,9 +174,11 @@ REDIS_DB = os.getenv("REDIS_DB", "0")
 CELERY_BROKER_URL = (
     f"redis://{os.getenv('REDIS_HOST', 'redis')}:{os.getenv('REDIS_PORT', '6379')}/0"
 )
+
 CELERY_RESULT_BACKEND = (
     f"redis://{os.getenv('REDIS_HOST', 'redis')}:{os.getenv('REDIS_PORT', '6379')}/0"
 )
+
 CELERY_TIMEZONE = "UTC"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
