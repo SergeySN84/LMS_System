@@ -61,6 +61,7 @@ jobs:
       - name: Apply migrations
         run: poetry run python manage.py migrate
         env:
+          SECRET_KEY: "django-insecure-1234567890abcdef1234567890abcdef"
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: lms_test
@@ -70,6 +71,7 @@ jobs:
       - name: Run tests
         run: poetry run python manage.py test
         env:
+          SECRET_KEY: "django-insecure-1234567890abcdef1234567890abcdef"
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: lms_test
