@@ -91,7 +91,6 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t lms-backend .
-          docker images
 
   deploy:
     runs-on: ubuntu-latest
