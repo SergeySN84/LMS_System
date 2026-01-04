@@ -103,9 +103,7 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key test@${{ secrets.SERVER_IP }} << 'EOF'
           cd ~/app
-          git fetch origin
-          git checkout "feature/homework_35.2"
-          git pull origin "feature/homework_35.2"
+          git pull origin feature/homework_35.2
           docker-compose -f docker-compose.prod.yaml down
           docker-compose -f docker-compose.prod.yaml up -d --build
           EOF
