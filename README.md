@@ -44,6 +44,6 @@
 
 ### Ручной деплой
 ```bash
-ssh -i ~/.ssh/yandex_deploy test@ваш ip сервера
+ssh -i ~/.ssh/yandex_deploy test@ВАШ_IP_СЕРВЕРА
 cd ~/app
 docker-compose -f docker-compose.prod.yaml up -d --build
