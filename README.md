@@ -33,7 +33,7 @@
 - SSH-доступ по ключам
 
 ### Настройка сервера
-1. Создайте пользователя `deploy`.
+1. Создайте пользователя `test`.
 2. Скопируйте публичный SSH-ключ в `~/.ssh/authorized_keys`.
 3. Установите Docker и Docker Compose.
 4. Создайте `~/app/.env` с продакшен-настройками.
@@ -44,6 +44,6 @@
 
 ### Ручной деплой
 ```bash
-ssh deploy@ваш_сервер
+ssh -i ~/.ssh/yandex_deploy test@ваш ip сервера
 cd ~/app
 docker-compose -f docker-compose.prod.yaml up -d --build
