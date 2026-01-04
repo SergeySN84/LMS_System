@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "feature/homework_35.2"
-      - "feature/homework_30.1"
+      - "develop"
 
 jobs:
   lint:
