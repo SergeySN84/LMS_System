@@ -37,5 +37,4 @@ urlpatterns = [
     ),
     path("api", include("users.urls")),
     path("api", include("materials.urls")),
-    path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
 ]
