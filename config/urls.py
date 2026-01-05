@@ -14,21 +14,28 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from materials.views import CourseViewSet
 
 
 router = DefaultRouter()
-router.register(r'courses', CourseViewSet)
+router.register(r"courses", CourseViewSet)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name= 'swagger_ui'),
-    path('', include('users.urls')),
-    path('', include('materials.urls')),
+    path("admin/", admin.site.urls),
+    path("api/", include(router.urls)),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger_ui",
+    ),
+    path("api", include("users.urls")),
+    path("api", include("materials.urls")),
+    path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
 ]

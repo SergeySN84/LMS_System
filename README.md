@@ -24,3 +24,26 @@
    ```bash
    docker-compose ps
    # Должен быть lms_db - STATUS Up
+   
+## Деплой проекта на удалённый сервер
+
+### Требования
+- Сервер с Ubuntu 22.04
+- Docker и Docker Compose
+- SSH-доступ по ключам
+
+### Настройка сервера
+1. Создайте пользователя `test`.
+2. Скопируйте публичный SSH-ключ в `~/.ssh/authorized_keys`.
+3. Установите Docker и Docker Compose.
+4. Создайте `~/app/.env` с продакшен-настройками.
+
+### GitHub Actions
+- Push в ветку `Feature/homework 35.2` → автоматический запуск тестов.
+- При успехе — деплой на сервер через SSH.
+
+### Ручной деплой
+```bash
+ssh -i ~/.ssh/yandex_deploy test@ВАШ_IP_СЕРВЕРА
+cd ~/app
+docker-compose -f docker-compose.prod.yaml up -d --build
